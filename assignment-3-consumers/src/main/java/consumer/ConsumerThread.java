@@ -21,15 +21,16 @@ public class ConsumerThread implements Runnable {
 
   private static final String QUEUE_NAME = "Queue";
   private static final String EXCHANGE_NAME = "SwipeExchange";
-
+  private static long SERVER_START_TIME;
   private Connection connection;
   private SwipeDao swipeDao;
 
   private static final Gson gson = new Gson();
 
-  public ConsumerThread(Connection connection, SwipeDao swipeDao) {
+  public ConsumerThread(Connection connection, SwipeDao swipeDao, long time) {
     this.connection = connection;
     this.swipeDao = swipeDao;
+    this.SERVER_START_TIME = time;
   }
 
   @Override
@@ -52,11 +53,11 @@ public class ConsumerThread implements Runnable {
     channel.basicQos(100);
     channel.queueDeclare(QUEUE_NAME, durable, exclusive, autoDelete, null);
     channel.exchangeDeclare(EXCHANGE_NAME, "direct", durable);
-    // last parameter for queueBind is routingKey
     channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "");
     DeliverCallback deliverCallback = (consumerTag, delivery) -> {
       String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
       Swipe swipe = gson.fromJson(message, Swipe.class);
+      swipe.setTime((int) (System.currentTimeMillis() -  SERVER_START_TIME));
       swipes.add(swipe);
       if (swipes.size() >= 100) {
         addListToSwipeData(swipes);
@@ -69,15 +70,6 @@ public class ConsumerThread implements Runnable {
       channel.basicAck(deliveryTag, multipleAcks.get());
     };
     channel.basicConsume(QUEUE_NAME, autoAck, deliverCallback, consumerTag -> {});
-  }
-
-  /**
-   * Adds a single swipe to the database
-   * @param swipe the swipe object
-   */
-  private void addSingleToSwipeData(Swipe swipe) {
-    swipeDao.createSwipe(swipe);
-//    System.out.println(swipe.getSwipeDirection() + " " + swipe.getSwiper() + " " + swipe.getSwipee());
   }
 
   /**

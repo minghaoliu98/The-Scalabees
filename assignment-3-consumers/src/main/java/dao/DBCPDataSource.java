@@ -9,14 +9,10 @@ public class DBCPDataSource {
   private static BasicDataSource dataSource;
 
   // NEVER store sensitive information below in plain text!
-  private static final String HOST_NAME = "localhost";
-  private static final String AWS = "database-3.ciiihiypfrfb.us-west-2.rds.amazonaws.com";
+  private static final String AWS = "db.czqeoccmut85.us-west-2.rds.amazonaws.com";
   private static final String PORT = "3306";
-  private static final String PORT_AWS = "3315";
-  private static final String DATABASE = "Twinder";
-  private static final String USERNAME = "root";
+  private static final String DATABASE = "sys";
   private static final String ADMIN = "admin";
-  private static final String AWS_PASSWORD = "Twinder1!";
   private static final String PASSWORD = "password";
 
   static {
@@ -27,10 +23,10 @@ public class DBCPDataSource {
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
-    String url = String.format("jdbc:mysql://%s:%s/%s?serverTimezone=UTC&rewriteBatchedStatements=true", AWS, PORT_AWS, DATABASE);
+    String url = String.format("jdbc:mysql://%s:%s/%s?serverTimezone=UTC&rewriteBatchedStatements=true", AWS, PORT , DATABASE);
     dataSource.setUrl(url);
     dataSource.setUsername(ADMIN);
-    dataSource.setPassword(AWS_PASSWORD);
+    dataSource.setPassword(PASSWORD);
     dataSource.setInitialSize(10);
     dataSource.setMaxTotal(30);
   }
