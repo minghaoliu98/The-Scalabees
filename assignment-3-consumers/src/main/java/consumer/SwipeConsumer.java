@@ -11,15 +11,13 @@ import java.util.concurrent.Executors;
  */
 public class SwipeConsumer {
 
-  private static final String AWS_PUBLIC = "34.216.20.114";
-  private static final String AWS_PRIVATE = "172.31.25.91";
+  private static final String AWS_PRIVATE = "35.93.141.108";
   private final static int NUM_THREADS = 50;
 
   public static void main(String[] argv) throws Exception {
     ConnectionFactory factory = new ConnectionFactory();
     factory.setHost(AWS_PRIVATE);
-    factory.setUsername("test");
-    factory.setPassword("test");
+    factory.setVirtualHost("mark");
     Connection connection = factory.newConnection();
     SwipeDao swipeDao = new SwipeDao();
     ExecutorService threadPool = Executors.newFixedThreadPool(NUM_THREADS);
@@ -27,5 +25,6 @@ public class SwipeConsumer {
     for (int j = 0; j < NUM_THREADS; j++) {
       threadPool.execute(new ConsumerThread(connection, swipeDao, server_start_time));
     }
+    System.out.println("it's work");
   }
 }

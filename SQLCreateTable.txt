@@ -1,0 +1,5 @@
+CREATE TABLE tinder(
+	swiper int,
+	swipee int,
+	t int,
+	like_or_dislike bool);

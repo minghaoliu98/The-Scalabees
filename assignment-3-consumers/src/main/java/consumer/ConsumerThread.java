@@ -46,12 +46,10 @@ public class ConsumerThread implements Runnable {
     final Channel channel = connection.createChannel();
     boolean autoAck = false;
     boolean durable = true;
-    boolean exclusive = false;
-    boolean autoDelete = false;
     AtomicBoolean multipleAcks = new AtomicBoolean(false);
     List<Swipe> swipes = Collections.synchronizedList(new ArrayList<>());
+
     channel.basicQos(100);
-    channel.queueDeclare(QUEUE_NAME, durable, exclusive, autoDelete, null);
     channel.exchangeDeclare(EXCHANGE_NAME, "direct", durable);
     channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "");
     DeliverCallback deliverCallback = (consumerTag, delivery) -> {
@@ -61,10 +59,7 @@ public class ConsumerThread implements Runnable {
       swipes.add(swipe);
       if (swipes.size() >= 100) {
         addListToSwipeData(swipes);
-        multipleAcks.set(true);
         swipes.clear();
-      } else {
-        multipleAcks.set(false);
       }
       long deliveryTag = delivery.getEnvelope().getDeliveryTag();
       channel.basicAck(deliveryTag, multipleAcks.get());
