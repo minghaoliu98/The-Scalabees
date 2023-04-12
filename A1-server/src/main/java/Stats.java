@@ -42,7 +42,7 @@ public class Stats extends HttpServlet {
         super.init();
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            String MYSQL_URL = "db.czqeoccmut85.us-west-2.rds.amazonaws.com";
+            String MYSQL_URL = "db-readonly.czqeoccmut85.us-west-2.rds.amazonaws.com";
             conn = DriverManager.getConnection("jdbc:mysql://" + MYSQL_URL + "/sys", "admin", "password");
         } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);
