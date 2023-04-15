@@ -38,7 +38,6 @@ public class SwipeDao {
         preparedStatement.setBoolean(4, swipe.getSwipeDirection());
         preparedStatement.addBatch();
       }
-      System.out.println(preparedStatement.toString());
       // execute insert SQL statement
       preparedStatement.executeBatch();
     } catch (SQLException e) {

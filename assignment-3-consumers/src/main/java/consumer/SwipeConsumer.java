@@ -11,8 +11,8 @@ import java.util.concurrent.Executors;
  */
 public class SwipeConsumer {
 
-  private static final String AWS_PRIVATE = "35.93.141.108";
-  private final static int NUM_THREADS = 50;
+  private static final String AWS_PRIVATE = "35.164.66.34";
+  private final static int NUM_THREADS = 100;
 
   public static void main(String[] argv) throws Exception {
     ConnectionFactory factory = new ConnectionFactory();

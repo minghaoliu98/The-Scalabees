@@ -12,13 +12,12 @@ import com.rabbitmq.client.Channel;
 
 @WebServlet(name = "SkierServlet", value = "/SkierServlet")
 public class SkierServlet extends HttpServlet {
-    private final String RABBITMQ_URL = "52.42.202.35";
+    private final String RABBITMQ_URL = "54.200.8.185";
     private final int NUM_THREAD = 100;
     private RMQChannelPool pool;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        sendQueue("HelloWorld");
         res.getWriter().write("It works!");
         res.setContentType("text/plain");
         res.setStatus(HttpServletResponse.SC_OK);

@@ -44,9 +44,7 @@ public class ConsumerThread implements Runnable {
 
   private void consume() throws IOException {
     final Channel channel = connection.createChannel();
-    boolean autoAck = false;
     boolean durable = true;
-    AtomicBoolean multipleAcks = new AtomicBoolean(false);
     List<Swipe> swipes = Collections.synchronizedList(new ArrayList<>());
 
     channel.basicQos(100);
@@ -54,6 +52,7 @@ public class ConsumerThread implements Runnable {
     channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "");
     DeliverCallback deliverCallback = (consumerTag, delivery) -> {
       String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+      System.out.println(message);
       Swipe swipe = gson.fromJson(message, Swipe.class);
       swipe.setTime((int) (System.currentTimeMillis() -  SERVER_START_TIME));
       swipes.add(swipe);
@@ -61,10 +60,9 @@ public class ConsumerThread implements Runnable {
         addListToSwipeData(swipes);
         swipes.clear();
       }
-      long deliveryTag = delivery.getEnvelope().getDeliveryTag();
-      channel.basicAck(deliveryTag, multipleAcks.get());
+      channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
     };
-    channel.basicConsume(QUEUE_NAME, autoAck, deliverCallback, consumerTag -> {});
+    channel.basicConsume(QUEUE_NAME, false, deliverCallback, consumerTag -> {});
   }
 
   /**
