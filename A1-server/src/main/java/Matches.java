@@ -1,4 +1,4 @@
-import com.rabbitmq.client.ConnectionFactory;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.sql.*;
 
 public class Matches extends HttpServlet {
-    private static Connection conn;
+    private static BasicDataSource dataSource = null;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -16,6 +16,7 @@ public class Matches extends HttpServlet {
         String result = "Some thing wrong";
         res.setContentType("text/plain");
         try {
+            Connection conn = dataSource.getConnection();
             PreparedStatement preparedStmt = conn.prepareStatement("SELECT swiper From tinder WHERE swipee = ? AND like_or_dislike = true order BY t DESC LIMIT 100");
             preparedStmt.setInt (1, id);
             ResultSet rs  = preparedStmt.executeQuery();
@@ -23,6 +24,7 @@ public class Matches extends HttpServlet {
             while(rs.next()) {
                 result += rs.getString("swiper") + " ";
             }
+            conn.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -34,10 +36,15 @@ public class Matches extends HttpServlet {
         super.init();
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            String MYSQL_URL = "db-readonly.czqeoccmut85.us-west-2.rds.amazonaws.com";
-            conn = DriverManager.getConnection("jdbc:mysql://" + MYSQL_URL + "/sys", "admin", "password");
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+        String MYSQL_URL = "db-matches.czqeoccmut85.us-west-2.rds.amazonaws.com";
+        dataSource = new BasicDataSource();
+        dataSource.setUrl("jdbc:mysql://" + MYSQL_URL + ":3306/sys");
+        dataSource.setUsername("admin");
+        dataSource.setPassword("password");
+        dataSource.setMinIdle(0);
+        dataSource.setMaxIdle(300);
     }
 }

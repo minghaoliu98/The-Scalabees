@@ -1,5 +1,5 @@
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.ConnectionFactory;
+
+import org.apache.commons.dbcp2.BasicDataSource;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -10,13 +10,15 @@ import java.sql.*;
 import java.util.Arrays;
 
 public class Stats extends HttpServlet {
-    private static Connection conn;
+    private static BasicDataSource dataSource = null;
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         int id = Integer.valueOf(req.getPathInfo().substring(1));
         String result = "Some thing wrong";
         res.setContentType("text/plain");
         try {
+            Connection conn = dataSource.getConnection();
             PreparedStatement preparedStmt = conn.prepareStatement("SELECT count(*)  as c, like_or_dislike as l From tinder WHERE swiper = ? GROUP BY like_or_dislike ORDER BY like_or_dislike;");
             preparedStmt.setInt (1, id);
             ResultSet rs  = preparedStmt.executeQuery();
@@ -30,6 +32,7 @@ public class Stats extends HttpServlet {
                 }
             }
             result = id + " has " + likeCount + " likes | " + dislikeCount + " dislikes";
+            conn.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -42,11 +45,16 @@ public class Stats extends HttpServlet {
         super.init();
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            String MYSQL_URL = "db-machts.czqeoccmut85.us-west-2.rds.amazonaws.com";
-            conn = DriverManager.getConnection("jdbc:mysql://" + MYSQL_URL + "/sys", "admin", "password");
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+        String MYSQL_URL = "db-stats.czqeoccmut85.us-west-2.rds.amazonaws.com";
+        dataSource = new BasicDataSource();
+        dataSource.setUrl("jdbc:mysql://" + MYSQL_URL + ":3306/sys");
+        dataSource.setUsername("admin");
+        dataSource.setPassword("password");
+        dataSource.setMinIdle(0);
+        dataSource.setMaxIdle(300);
     }
 
 }
