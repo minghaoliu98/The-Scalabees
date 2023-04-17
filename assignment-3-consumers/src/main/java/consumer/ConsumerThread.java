@@ -58,6 +58,7 @@ public class ConsumerThread implements Runnable {
       swipes.add(swipe);
       if (swipes.size() >= 100) {
         addListToSwipeData(swipes);
+        System.out.println("uploaded");
         swipes.clear();
       }
       channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);

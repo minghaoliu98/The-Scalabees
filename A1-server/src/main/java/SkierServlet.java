@@ -12,7 +12,7 @@ import com.rabbitmq.client.Channel;
 
 @WebServlet(name = "SkierServlet", value = "/SkierServlet")
 public class SkierServlet extends HttpServlet {
-    private final String RABBITMQ_URL = "54.200.8.185";
+    private final String RABBITMQ_URL = "34.217.13.242";
     private final int NUM_THREAD = 100;
     private RMQChannelPool pool;
 
