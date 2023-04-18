@@ -25,6 +25,7 @@ public class Matches extends HttpServlet {
                 result += rs.getString("swiper") + " ";
             }
             conn.close();
+            rs.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -44,7 +45,9 @@ public class Matches extends HttpServlet {
         dataSource.setUrl("jdbc:mysql://" + MYSQL_URL + ":3306/sys");
         dataSource.setUsername("admin");
         dataSource.setPassword("password");
-        dataSource.setMinIdle(0);
-        dataSource.setMaxIdle(300);
+        dataSource.setInitialSize(10);
+        dataSource.setMaxTotal(200);
+        dataSource.setMinIdle(5);
+        dataSource.setMaxIdle(30);
     }
 }

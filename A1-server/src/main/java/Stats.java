@@ -22,6 +22,7 @@ public class Stats extends HttpServlet {
             PreparedStatement preparedStmt = conn.prepareStatement("SELECT count(*)  as c, like_or_dislike as l From tinder WHERE swiper = ? GROUP BY like_or_dislike ORDER BY like_or_dislike;");
             preparedStmt.setInt (1, id);
             ResultSet rs  = preparedStmt.executeQuery();
+
             int dislikeCount = 0;
             int likeCount = 0;
             while (rs.next()) {
@@ -31,8 +32,9 @@ public class Stats extends HttpServlet {
                     dislikeCount = rs.getInt("c");
                 }
             }
-            result = id + " has " + likeCount + " likes | " + dislikeCount + " dislikes";
             conn.close();
+            rs.close();
+            result = id + " has " + likeCount + " likes | " + dislikeCount + " dislikes";
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -53,8 +55,10 @@ public class Stats extends HttpServlet {
         dataSource.setUrl("jdbc:mysql://" + MYSQL_URL + ":3306/sys");
         dataSource.setUsername("admin");
         dataSource.setPassword("password");
-        dataSource.setMinIdle(0);
-        dataSource.setMaxIdle(300);
+        dataSource.setInitialSize(10);
+        dataSource.setMaxTotal(200);
+        dataSource.setMinIdle(5);
+        dataSource.setMaxIdle(30);
     }
 
 }
