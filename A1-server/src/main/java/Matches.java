@@ -17,7 +17,7 @@ public class Matches extends HttpServlet {
         res.setContentType("text/plain");
         try {
             Connection conn = dataSource.getConnection();
-            PreparedStatement preparedStmt = conn.prepareStatement("SELECT swiper From tinder WHERE swipee = ? AND like_or_dislike = true order BY t DESC LIMIT 100");
+            PreparedStatement preparedStmt = conn.prepareStatement("SELECT swipee From tinder WHERE swiper = ? AND like_or_dislike = true order BY t DESC LIMIT 100");
             preparedStmt.setInt (1, id);
             ResultSet rs  = preparedStmt.executeQuery();
             result = "User: " + id + " most recent likes: ";
